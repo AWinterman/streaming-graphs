@@ -1,8 +1,8 @@
-d3 = require('d3');
-init_factory = require("./initialize")
+module.exports = streamgraph
 
-// pertinent SO question: http://stackoverflow.com/questions/9664642/d3-real-time-streamgraph-graph-data-visualization
-
+var d3 = require('d3')
+var inititialize = require("./initialize")
+var through = require('through')
 //streaming graph data:
 //
 //all the data streams are 
@@ -16,50 +16,55 @@ init_factory = require("./initialize")
 //through stream data shape:
 //
 
-module.exports = streamgraph
 
-var through = require('through')
+function streamgraph_factory(target_element){
+  function streamgraph(names, update, span, initial_data) {
+    //:param names: an array of names of layers in the streamgraph
+    //:param update: update the stream graphs every `update` milisecodns
+    //:param span: the timedelta which the stream graph covers
 
-function streamgraph(names, update, span) {
-  //:param names: an array of names of layers in the streamgraph
-  //:param update: update the stream graphs every `update` milisecodns
-  //:param span: the timedelta which the stream graph covers
 
-  initialize = initialize(names, 800, 400) //including width and height for now
-  {span: 86400000, update: 600000})
-  
+    var data_details = {span: span, update: update, data: initial_data},
+      , stream_element = initialize(target_element)(names, data_details)
+      , stream = through(write)
+      , index_map = {} 
+      //index_map let's you easily get the index of the data array corresponding
+      //to the name
+      , stream_data = stream_element.data()
 
-  var stream = through(write)
-    , index_map = {} 
-    //index_map let's you easily get the index of the data array corresponding
-    //to the name
-    , stream_data
+    return stream
 
-  return stream
+    function write(obj) {
 
-  function write(obj) {
+      stream_data = d3.select(target_element + ".streamGraph").data()
+      for(var i = 0, len = names.length; i < len; ++i) {
+        index_map[names[i]] = i
+        var newval = obj[names[i]]
 
-    stream_data = d3.select(target_element + ".streamGraph").data()
-    for(var i = 0, len = names.length; i < len; ++i) {
-      index_map[names[i]] = i
-      var newval = obj[names[i]]
+        //so in order to push newval onto the data array, I need to know if there
+        //already is an array for the object. So let's make a shallow copy of the data bound
+        //to the stream object. We know 
 
-      //so in order to push newval onto the data array, I need to know if there
-      //already is an array for the object. So let's make a shallow copy of the data bound
-      //to the stream object. We know 
-
-      stream_data[index_map[name]].push(newval)
-      //if the beginning time is less than the newval - span, pop if off the
-      //beginning
-      if ( exceeds_span(stream_data[index_map[name]], span) ) {
-        remove_from_beginning(stream_data)
+        stream_data[index_map[name]].push(newval)
+        //if the beginning time is less than the newval - span, pop if off the
+        //beginning
+        if ( exceeds_span(stream_data[index_map[names[i]]], span) ) {
+          remove_from_beginning(index_map[names[i]], span)
+        }
       }
-
     }
 
-  }
+    function exceeds_span(idx, span){
+      //just returns whether or not there is an data point outside of the span 
+        }
 
+    function remove_from_beginning(idx, span){
+      //side effectful function that cuts elements from stream_data (defined in
+      //enclosing scope) which do not fall into the time span
+
+  }
 }
+
 
 
 

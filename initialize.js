@@ -1,18 +1,12 @@
-
 module.exports = initialize
 
-d3 = require("d3")
-BaseMapping = require("./BaseMapping")
+var d3 = require("d3")
+var BaseMapping = require("./BaseMapping")
 
 function initialize(target_element){
 
   return function(names, data_and_details){
-    //so we have real time data.
-    //
-    //so any empty data element should be filled with the last seen element
-    //
-
-    var container = d3.select(target_element)
+     var container = d3.select(target_element)
       , dimension = [container.style("width"), container.style("height")]
       , int_dimension = dimension.map(function(d){ return + d.slice(0, -2) })
       , stack = d3.layout.stack() //stack just computes coords
@@ -23,16 +17,9 @@ function initialize(target_element){
       , time_domain = [+new Date() - span, +new Date()] //limits of time
       , value_domain
 
-
-
     //initialize x and y mapppings
     var x = new BaseMapping(d3.svg.axis(), d3.scale.linear(), function(d){ return d.time })
         y = new BaseMapping(d3.svg.axis(), d3.scale.linear(), function(d){ return d.value })
-
-
-
-
-
 
     if (data === undefined) data = d3.range(names.length).map(function(x){return []}) 
     if (span && update){
@@ -41,9 +28,6 @@ function initialize(target_element){
       }
     }
 
-
-
-    
     //define scale functions:
     x.scale.range([0, int_dimension[0]])
            .domain(time_domain)
@@ -79,13 +63,12 @@ function initialize(target_element){
              .selectAll("path")
              .data(stack(data))
             .enter()
+            //probably want to add some sort of class here
              .append('path')
              .attr("d", function(d){
                 return area(d)
              })
     
-
-
     function fill_data(idx){
       //figure out the last time for the data, if it exists
       for( end_time = time_domain[1],
@@ -98,5 +81,6 @@ function initialize(target_element){
         data[idx].push({time: time, value: 0})
       }
     }
+    return container.select("g")
   }
 }
