@@ -62,8 +62,9 @@ function initialize(target_element){
      area.x(function(d) { return x.place(d) })
          .y0(function(d) { return y.scale(d.y0) })
          .y1(function(d) { return y.scale(d.y0 + d.y) })
-         .interpolate("basis")
 
+    console.log(data)
+    console.log(stack)
     var stack_data = stack(data)
     console.log(stack_data)
     

@@ -84,6 +84,7 @@ function streamgraph_factory(target_element, offset){
       //now the raw_data has been updated appropriately.
       //update the scales based on the new data
 
+      //repeating myself
       var highest_value = raw_data.reduce(
           function(a,b){
             //need to do vectorized add
@@ -117,6 +118,7 @@ function streamgraph_factory(target_element, offset){
       context.container.select(".streamGraph").selectAll("path")
                        .data(context.stack(raw_data))
                        .transition()
+                       .duration(100)
                        .attr("d", function(d){
                           return context.area(d)
                        })
