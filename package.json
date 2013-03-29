@@ -1,0 +1,28 @@
+{
+  "name": "streamgraph",
+  "version": "0.0.0",
+  "description": "making a streamgraph for streaming data (see what I did therE)",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AWinterman/streaming-graphs.git"
+  },
+  "keywords": [
+    "streaming",
+    "data",
+    "Lee",
+    "Byron's",
+    "Stream",
+    "Graph"
+  ],
+  "author": "andrew winterman <andrew.winterman@urbanairship.com>",
+  "license": "MIT",
+  "readmeFilename": "readme.md",
+  "gitHead": "8467d2248c06233704d383f32ca7b746da74dd3f",
+  "dependencies": {
+    "through": "~2.2.7"
+  }
+}
