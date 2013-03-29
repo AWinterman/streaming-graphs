@@ -1,4 +1,5 @@
 module.exports = initialize
+//TODO Axes
 
 var d3 = require("d3")
 var BaseMapping = require("./BaseMapping")
@@ -56,10 +57,10 @@ function initialize(target_element){
         .y1(function(d) { return y.scale(d.y0 + d.y) })
         
     container.append("svg")
-             .attr("class", "streamGraph")
              .attr("height", dimension[1])
              .attr("width", dimension[0])
             .append("g")
+             .attr("class", "streamGraph")
              .selectAll("path")
              .data(stack(data))
             .enter()
@@ -81,6 +82,15 @@ function initialize(target_element){
         data[idx].push({time: time, value: 0})
       }
     }
-    return container.select("g")
+  
+    //I think I need to return the element with the data on it, and everything
+    //I need to call the enxt element.
+    return { container: container
+           , data: data
+           , area: area
+           , stack: stack
+           , x: x
+           , y: y}
+    }
+
   }
-}

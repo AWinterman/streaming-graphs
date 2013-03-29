@@ -17,7 +17,13 @@ var through = require('through')
 //
 
 
-function streamgraph_factory(target_element){
+function streamgraph_factory(target_element, offset){
+  //target element gives d3 selector for the DOM element in which you would
+  //like to create a streamgraph, offset is the time offset in miliseconds,
+  //e.g. the lag in client and server in returning the newest data point. E.g.
+  //given a measurement coming in at time `t`,  our best guess of the time the
+  //measurement was taken is `t - offset`
+
   function streamgraph(names, update, span, initial_data) {
     //:param names: an array of names of layers in the streamgraph
     //:param update: update the stream graphs every `update` milisecodns
@@ -25,44 +31,90 @@ function streamgraph_factory(target_element){
 
 
     var data_details = {span: span, update: update, data: initial_data},
-      , stream_element = initialize(target_element)(names, data_details)
+      , context = initialize(target_element)(names, data_details)
       , stream = through(write)
       , index_map = {} 
       //index_map let's you easily get the index of the data array corresponding
       //to the name
-      , stream_data = stream_element.data()
+      , stream_data = context.container.select("g").data()
+      , raw_data = context.data
 
     return stream
 
     function write(obj) {
+      var new_point
+        , max_time = +new Date() - offset 
+      stream_data = context.container.select(".streamGraph").data()
 
-      stream_data = d3.select(target_element + ".streamGraph").data()
       for(var i = 0, len = names.length; i < len; ++i) {
+        var new_val = obj[names[i]]
         index_map[names[i]] = i
-        var newval = obj[names[i]]
 
-        //so in order to push newval onto the data array, I need to know if there
+        //so in order to push new_val onto the data array, I need to know if there
         //already is an array for the object. So let's make a shallow copy of the data bound
         //to the stream object. We know 
 
-        stream_data[index_map[name]].push(newval)
-        //if the beginning time is less than the newval - span, pop if off the
-        //beginning
-        if ( exceeds_span(stream_data[index_map[names[i]]], span) ) {
-          remove_from_beginning(index_map[names[i]], span)
+        //make sure we actually got a value
+        if (new_val!== undefined or new_val !== null){
+          new_point = new_val
         }
+        else {
+          //otherwise use the last one if it exists. If there are no values,
+          //default to 0 for this timestep
+
+          if (raw_data[index_map[name]].length){
+            new_point = raw_data[index_map[name]].slice(-1))
+          }
+          else {
+            new_point = 0
+          }
+        }
+
+        raw_data[index_map[name]].push(new_point) 
+        //now trim
+        trim(idx, span)
       }
+      //now the raw_data has been updated appropriately.
+
+      //update the scales based on the new data
+      context.y.domain = d3.range(raw_data, context.y.accessor)
+      context.x.domain = [max_time - span, max_time]
+
+
+      //updating area function
+      //repeating myself here
+      area.x(function(d) { return x.place(d) })
+          .y0(function(d) { return y.scale(d.y0) })
+          .y1(function(d) { return y.scale(d.y0 + d.y) })
+
+      //updating streamdata:
+      //TODO splice together old and new data in a way that makes the
+      //transition nice
+
+      context.container.select(".streamGraph").data(context.stack(raw_data)).attr("d", area)
+
+
+      //TODO axis
+
+      //recompute the layout
+
+      //transition to new data
     }
 
-    function exceeds_span(idx, span){
+    function trim(idx, span){
       //just returns whether or not there is an data point outside of the span 
+      start_from = 0
+      for (i = 0, len = raw_data[idx].length; i < len; ++i){
+        if (raw_data[idx][i] < max_time - span){
+          start_from += 1
         }
-
-    function remove_from_beginning(idx, span){
-      //side effectful function that cuts elements from stream_data (defined in
-      //enclosing scope) which do not fall into the time span
-
-  }
+        else {
+          break
+        }
+      }
+      raw_data[idx] = raw_data[idx].splice(start_from)
+      return start_from //return the index, might need that again.
+    }
 }
 
 
