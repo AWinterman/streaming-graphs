@@ -23,14 +23,12 @@ function initialize(target_element){
       , time_domain = [+new Date() - span, +new Date()] //limits of time
       , value_domain
 
-      console.log(int_dimension)
 
 
     //initialize x and y mapppings
     var x = new BaseMapping(d3.svg.axis(), d3.scale.linear(), function(d){ return d.time })
         y = new BaseMapping(d3.svg.axis(), d3.scale.linear(), function(d){ return d.value })
 
-    console.log(x, y)
 
 
 
@@ -50,7 +48,6 @@ function initialize(target_element){
     x.scale.range([0, int_dimension[0]])
            .domain(time_domain)
 
-           console.log(y, y.accessor)
     value_domain = d3.extent(data, y.accessor)
                      .map(function(d, i){
                        return d === undefined ? i : d;
@@ -84,11 +81,7 @@ function initialize(target_element){
             .enter()
              .append('path')
              .attr("d", function(d){
-               console.log(
-                 d.map(function(o){return x.accessor(o)}),
-                 d.map(function(o){return x.place(o)})
-                 )
-               return area(d)
+                return area(d)
              })
     
 
