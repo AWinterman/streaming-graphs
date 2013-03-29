@@ -2,13 +2,16 @@
 
 full dependency list:
 
-## modules to know and love
+## modules used here
 
 * [beefy](http://npm.im/beefy)
 * [browserify](http://npm.im/browserify)
+* [d3](http://npm.im/d3)
+
+
+## Modules we intended to use
 * [ever](http://npm.im/ever)
 * [ever-delegate](http://npm.im/ever-delegate)
-* [d3](http://npm.im/d3)
 * [plate](http://npm.im/plate)
 * [polymaps ?](http://polymaps.org/)
 * [sse-stream](http://npm.im/sse-stream)
