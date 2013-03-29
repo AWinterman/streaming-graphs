@@ -1,7 +1,6 @@
-# Bigboard streaming graph part #
+#Down River
 
-full dependency list:
-
+js for  a streamgraph with streaming data.
 ## modules used here
 
 * [beefy](http://npm.im/beefy)
