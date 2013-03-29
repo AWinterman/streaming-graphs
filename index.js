@@ -1,5 +1,5 @@
 d3 = require('d3');
-init_factor = require("./initialize")
+init_factory = require("./initialize")
 
 // pertinent SO question: http://stackoverflow.com/questions/9664642/d3-real-time-streamgraph-graph-data-visualization
 
@@ -24,6 +24,10 @@ function streamgraph(names, update, span) {
   //:param names: an array of names of layers in the streamgraph
   //:param update: update the stream graphs every `update` milisecodns
   //:param span: the timedelta which the stream graph covers
+
+  initialize = initialize(names, 800, 400) //including width and height for now
+  {span: 86400000, update: 600000})
+  
 
   var stream = through(write)
     , index_map = {} 
@@ -51,11 +55,8 @@ function streamgraph(names, update, span) {
         remove_from_beginning(stream_data)
       }
 
-      }
-
-      stream.data().push(newval)
-      stream.data.unshift()
     }
+
   }
 
 }
