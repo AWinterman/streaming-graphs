@@ -20,7 +20,11 @@ function initialize(target_element){
 
     //initialize x and y mapppings
     var x = new BaseMapping(d3.svg.axis(), d3.scale.linear(), function(d){ return d.time })
-        y = new BaseMapping(d3.svg.axis(), d3.scale.linear(), function(d){ return d.value })
+        , y = new BaseMapping(d3.svg.axis(), d3.scale.linear(), function(d){ return d.value })
+        , color = new BaseMapping(null, d3.scale.category10(), function(d){return d})
+
+    //can't specify much about color until we know what names we're dealing
+    //with.
 
     if (data === undefined) data = d3.range(names.length).map(function(x){return []}) 
     if (span && update){
@@ -69,6 +73,10 @@ function initialize(target_element){
              .attr("d", function(d){
                 return area(d)
              })
+             .attr("fill", function(d, i){
+               return color.place(i)
+             })
+             .attr("stroke", "black")
     
     function fill_data(idx){
       //figure out the last time for the data, if it exists

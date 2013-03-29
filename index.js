@@ -1,7 +1,7 @@
-module.exports = streamgraph
+module.exports = streamgraph_factory
 
 var d3 = require('d3')
-var inititialize = require("./initialize")
+var initialize = require("./initialize")
 var through = require('through')
 //streaming graph data:
 //
@@ -23,13 +23,14 @@ function streamgraph_factory(target_element, offset){
   //e.g. the lag in client and server in returning the newest data point. E.g.
   //given a measurement coming in at time `t`,  our best guess of the time the
   //measurement was taken is `t - offset`
+  return streamgraph
 
   function streamgraph(names, update, span, initial_data) {
     //:param names: an array of names of layers in the streamgraph
     //:param update: update the stream graphs every `update` milisecodns
     //:param span: the timedelta which the stream graph covers
 
-
+  
     var data_details = {span: span, update: update, data: initial_data}
       , context = initialize(target_element)(names, data_details)
       , stream = through(write)
@@ -47,8 +48,11 @@ function streamgraph_factory(target_element, offset){
       stream_data = context.container.select(".streamGraph").data()
 
       for(var i = 0, len = names.length; i < len; ++i) {
-        var new_val = obj[names[i]]
-        index_map[names[i]] = i
+
+        var name = names[i]
+          , new_val = obj[name]
+
+        index_map[name] = i
 
         //so in order to push new_val onto the data array, I need to know if there
         //already is an array for the object. So let's make a shallow copy of the data bound
@@ -72,26 +76,31 @@ function streamgraph_factory(target_element, offset){
 
         raw_data[index_map[name]].push(new_point) 
         //now trim
-        trim(idx, span)
+        trim(index_map[name], span, max_time)
       }
       //now the raw_data has been updated appropriately.
 
       //update the scales based on the new data
-      context.y.domain = d3.range(raw_data, context.y.accessor)
+      context.y.domain = d3.range(raw_data, function(d){
+       return context.y.accessor(d)
+      })
       context.x.domain = [max_time - span, max_time]
-
 
       //updating area function
       //repeating myself here
-      area.x(function(d) { return x.place(d) })
-          .y0(function(d) { return y.scale(d.y0) })
-          .y1(function(d) { return y.scale(d.y0 + d.y) })
+      context.area.x(function(d) { return context.x.place(d) })
+          .y0(function(d) { return context.y.scale(d.y0) })
+          .y1(function(d) { return context.y.scale(d.y0 + d.y) })
 
       //updating streamdata:
       //TODO splice together old and new data in a way that makes the
       //transition nice
-
-      context.container.select(".streamGraph").data(context.stack(raw_data)).attr("d", area)
+      console.log(context.stack(raw_data))
+      context.container.select(".streamGraph")
+                       .data(context.stack(raw_data))
+                       .attr("d", function(d){
+                         context.area(d)
+                       })
       //TODO axis
 
       //recompute the layout
@@ -99,7 +108,7 @@ function streamgraph_factory(target_element, offset){
       //transition to new data
     }
 
-    function trim(idx, span){
+    function trim(idx, span, max_time){
       //just returns whether or not there is an data point outside of the span 
       start_from = 0
       for (i = 0, len = raw_data[idx].length; i < len; ++i){
