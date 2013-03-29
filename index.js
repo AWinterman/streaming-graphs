@@ -1,5 +1,5 @@
 d3 = require('d3');
-init = require("./initialize")
+init_factor = require("./initialize")
 
 // pertinent SO question: http://stackoverflow.com/questions/9664642/d3-real-time-streamgraph-graph-data-visualization
 
