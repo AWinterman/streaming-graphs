@@ -6,7 +6,7 @@ function stream_existing(data, ttl) {
   var out = through()
     , idx = 0
 
-  setInterval(write)
+  setInterval(write, 500)
   return out
 
   function write() {

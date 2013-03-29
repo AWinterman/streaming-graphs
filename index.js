@@ -25,19 +25,18 @@ function streamgraph_factory(target_element, offset){
   //measurement was taken is `t - offset`
   return streamgraph
 
-  function streamgraph(names, update, span, initial_data) {
+  function streamgraph(names, data_details) {
     //:param names: an array of names of layers in the streamgraph
-    //:param update: update the stream graphs every `update` milisecodns
-    //:param span: the timedelta which the stream graph covers
+    //:param data_details: object of type {update, span, initial_data}
+    //  :attr update: update the stream graphs every `update` milisecodns
+    //  :attr span: the timedelta which the stream graph covers
+    //  :attr data_details: data to start out with
 
-  
-    var data_details = {span: span, update: update, data: initial_data}
-      , context = initialize(target_element)(names, data_details)
+    var context = initialize(target_element)(names, data_details)
       , stream = through(write)
       , index_map = {} 
       //index_map let's you easily get the index of the data array corresponding
       //to the name
-      , stream_data = context.container.select("g").data()
       , raw_data = context.data
 
     return stream
@@ -45,7 +44,7 @@ function streamgraph_factory(target_element, offset){
     function write(obj) {
       var new_point
         , max_time = +new Date() - offset 
-      stream_data = context.container.select(".streamGraph").data()
+      //stream_data = context.container.select(".streamGraph").selectAll("layer").data()
 
       for(var i = 0, len = names.length; i < len; ++i) {
 
@@ -59,32 +58,52 @@ function streamgraph_factory(target_element, offset){
         //to the stream object. We know 
 
         //make sure we actually got a value
+        new_point = {value: null, time: max_time}
         if (new_val!== undefined || new_val !== null){
-          new_point = new_val
+          new_point.value = new_val
         }
         else {
           //otherwise use the last one if it exists. If there are no values,
           //default to 0 for this timestep
 
           if (raw_data[index_map[name]].length){
-            new_point = raw_data[index_map[name]].slice(-1)
+            new_point.value = raw_data[index_map[name]].slice(-1)[0]
           }
           else {
-            new_point = 0
+            new_point.value = 0
           }
         }
 
+
         raw_data[index_map[name]].push(new_point) 
         //now trim
-        trim(index_map[name], span, max_time)
-      }
-      //now the raw_data has been updated appropriately.
+        trim(index_map[name], data_details.span, max_time)
 
+      }
+
+      //now the raw_data has been updated appropriately.
       //update the scales based on the new data
-      context.y.domain = d3.range(raw_data, function(d){
-       return context.y.accessor(d)
-      })
-      context.x.domain = [max_time - span, max_time]
+
+      var highest_value = raw_data.reduce(
+          function(a,b){
+            //need to do vectorized add
+            return a.map(function(d,i){
+              return context.y.accessor(d) +  context.y.accessor(b[i])
+            })
+          });
+      //console.log(d3.extent(highest_value, context.y.accessor))
+
+      context.y.scale.domain( d3.extent(highest_value, context.y.accessor))
+
+      //x scale is the same across all layers
+      context.x.scale.domain(d3.extent(raw_data[0], context.x.accessor))
+      
+
+      //y scale is the sum of all the counts in raw_data
+
+      
+      //console.log(context.y.scale(5500))
+
 
       //updating area function
       //repeating myself here
@@ -95,21 +114,20 @@ function streamgraph_factory(target_element, offset){
       //updating streamdata:
       //TODO splice together old and new data in a way that makes the
       //transition nice
-      console.log(context.stack(raw_data))
-      context.container.select(".streamGraph")
+      context.container.select(".streamGraph").selectAll("path")
                        .data(context.stack(raw_data))
+                       .transition()
                        .attr("d", function(d){
-                         context.area(d)
+                          return context.area(d)
                        })
       //TODO axis
-
       //recompute the layout
-
       //transition to new data
     }
 
     function trim(idx, span, max_time){
       //just returns whether or not there is an data point outside of the span 
+      obj = raw_data[0][raw_data[0].length-1]
       start_from = 0
       for (i = 0, len = raw_data[idx].length; i < len; ++i){
         if (raw_data[idx][i] < max_time - span){
