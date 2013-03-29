@@ -30,7 +30,7 @@ function streamgraph_factory(target_element, offset){
     //:param span: the timedelta which the stream graph covers
 
 
-    var data_details = {span: span, update: update, data: initial_data},
+    var data_details = {span: span, update: update, data: initial_data}
       , context = initialize(target_element)(names, data_details)
       , stream = through(write)
       , index_map = {} 
@@ -55,7 +55,7 @@ function streamgraph_factory(target_element, offset){
         //to the stream object. We know 
 
         //make sure we actually got a value
-        if (new_val!== undefined or new_val !== null){
+        if (new_val!== undefined || new_val !== null){
           new_point = new_val
         }
         else {
@@ -63,7 +63,7 @@ function streamgraph_factory(target_element, offset){
           //default to 0 for this timestep
 
           if (raw_data[index_map[name]].length){
-            new_point = raw_data[index_map[name]].slice(-1))
+            new_point = raw_data[index_map[name]].slice(-1)
           }
           else {
             new_point = 0
@@ -92,8 +92,6 @@ function streamgraph_factory(target_element, offset){
       //transition nice
 
       context.container.select(".streamGraph").data(context.stack(raw_data)).attr("d", area)
-
-
       //TODO axis
 
       //recompute the layout
@@ -115,6 +113,7 @@ function streamgraph_factory(target_element, offset){
       raw_data[idx] = raw_data[idx].splice(start_from)
       return start_from //return the index, might need that again.
     }
+  }
 }
 
 
