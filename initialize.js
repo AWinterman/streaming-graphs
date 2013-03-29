@@ -42,7 +42,6 @@ function initialize(target_element){
       if (m < value_domain[0]) value_domain[0] = m
     }
 
-    value_domain = [min, max]
     y.scale.range([dimension[1], 0]) //because svg is measured from the top
            .domain(value_domain)
 
@@ -63,6 +62,7 @@ function initialize(target_element){
      area.x(function(d) { return x.place(d) })
          .y0(function(d) { return y.scale(d.y0) })
          .y1(function(d) { return y.scale(d.y0 + d.y) })
+         .interpolate("basis")
 
     var stack_data = stack(data)
     console.log(stack_data)

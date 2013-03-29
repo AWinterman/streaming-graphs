@@ -19,8 +19,3 @@ full dependency list:
 * [debounce](http://npm.im/debounce)
 * [hyperquest](http://npm.im/hyperquest)
 * [tape](http://npm.im/tape) for tests
-
-## firehose (for events!)
-
-curl http://qa15.test.urbanairship.com:8080/firehose
-
