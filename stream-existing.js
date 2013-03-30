@@ -1,3 +1,11 @@
+//a simple module which takes a data array and streams it via a through object.
+//Pretty snazzy if you ask me
+//
+//TODO make this export a factory which takes `interval` as a param, allowing
+//the client to set the interval at which data should be emitted
+
+//usage:
+//stream_existing(through_object())
 var through = require('through')
 
 module.exports = stream_existing

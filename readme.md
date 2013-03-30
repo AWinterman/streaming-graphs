@@ -1,12 +1,20 @@
 #Down River
 
-js for  a streamgraph with streaming data.
+a node module which constructs a streamgraph for streaming data.
+
 ## modules used here
 
 * [beefy](http://npm.im/beefy)
+  convenient testing (+other things? not to familiar with this one)
+
 * [browserify](http://npm.im/browserify)
+  Node style require and module.exports in for the browser
+
 * [d3](http://npm.im/d3)
+  data driven documents-- powerful visualization framework for the web
+
 * [through](http://npm.im/through)
+  streaming and server side events
 
 ## Modules we intended to use
 * [ever](http://npm.im/ever)

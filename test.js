@@ -1,3 +1,4 @@
+//run all the things!
 var through = require("through")
 var stream_graph = require("./index")
 var initialize = require("./initialize")
@@ -23,7 +24,7 @@ d3.json("./gistfile1.json", function(data){
    })
 
   existing(data.slice(10)).pipe(
-    stream_graph("#testDiv", 1000)(names, { data:[Data] })
+    stream_graph("#testDiv", 1000)(names, [Data])
     )
 })
 
