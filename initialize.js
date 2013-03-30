@@ -14,7 +14,7 @@ function initialize(target_element){
         //TODO add padding for the axes
       , dimension = [container.style("width"), container.style("height")]
       , stack = d3.layout.stack() //stack just computes coords (layout for the plot)
-      , area = d3.svg.area() //draws on the DOM
+      , area = d3.svg.area() //computes SVG elements to draw on the DOM
       , update = data_and_details.update
       , time_domain  //limits of time
       , value_domain //limits of the values
@@ -56,7 +56,7 @@ function initialize(target_element){
 
     //now that we have scales, update the layout function:
     stack
-      .offset('zero')
+      .offset('zero') //can change this to make a stream!
       //.order() can set order if this is desired.  I think this
       //should be in order of reverse magnitude, for some reasonable definition
       //of magnitude
